@@ -95,7 +95,7 @@ public class Main{
                 int kapasitas_lounge = sc.nextInt();
                 sc.nextLine();
                 System.out.print("Masukan harga tiket premium: ");
-                while(!sc.hasNextInt()){
+                while(!sc.hasNextDouble()){
                     System.out.print("Masukan hanya angka: ");
                     sc.next();
                 }
@@ -148,71 +148,155 @@ public class Main{
                     */
                     for (BioskopLuxury b : daftarBioskop) {
                         spasi_nama   = Math.max(spasi_nama, b.getnama().length() + 2);
+                        if(spasi_nama < String.valueOf("Nama").length()){
+                            spasi_nama = String.valueOf("Nama").length();
+                        }
                         spasi_nama_lounge   = Math.max(spasi_nama_lounge, b.getnama_lounge().length() + 2);
+                        if(spasi_nama_lounge < String.valueOf("Nama Lounge").length()){
+                            spasi_nama_lounge = String.valueOf("Nama lounge").length();
+                        }
                         spasi_nama_restoran   = Math.max(spasi_nama_restoran, b.getnama_restoran().length() + 2);
+                        if(spasi_nama_restoran < String.valueOf("Nama restoran").length()){
+                            spasi_nama_restoran = String.valueOf("Nama restran").length();
+                        }
                         spasi_alamat = Math.max(spasi_alamat, b.getalamat().length() + 2);
+                        if(spasi_alamat < String.valueOf("Alamat").length()){
+                            spasi_alamat = String.valueOf("Alamat").length();
+                        }
                         spasi_kota   = Math.max(spasi_kota, b.getkota().length() + 2);
-                        spasi_id     = Math.max(spasi_id, String.valueOf(b.getid()).length() + 2);
+                        if(spasi_kota < String.valueOf("Kota").length()){
+                            spasi_kota = String.valueOf("Kota").length();
+                        }
+                        spasi_id = Math.max(spasi_id, String.valueOf(b.getid()).length() + 2);
+                        if(spasi_id < String.valueOf("Id").length()){
+                            spasi_id = String.valueOf("Id").length();
+                        }
                         spasi_jumlah = Math.max(spasi_jumlah, String.valueOf(b.getjumlah_studio()).length() + 2);
+                        if(spasi_jumlah < String.valueOf("Jumlah Studio").length()){
+                            spasi_jumlah = String.valueOf("Jumlah Studio").length();
+                        }
                         spasi_kapasitas_lounge = Math.max(spasi_kapasitas_lounge, String.valueOf(b.getkapasitas_lounge()).length() + 2);
+                        if(spasi_kapasitas_lounge < String.valueOf("Kapasitas Lounge").length()){
+                            spasi_kapasitas_lounge = String.valueOf("Kapasitas Lounge").length();
+                        }
                         spasi_harga_tiket_premium = Math.max(spasi_harga_tiket_premium, String.valueOf(b.getharga_tiket_premium()).length() + 2);
+                        if(spasi_harga_tiket_premium < String.valueOf("Harga Tiket (Rp)").length()){
+                            spasi_harga_tiket_premium = String.valueOf("Harga Tiket (Rp)").length();
+                        }
                         spasi_jumlah_meja = Math.max(spasi_jumlah_meja, String.valueOf(b.getjumlah_meja()).length() + 2);
+                        if(spasi_jumlah_meja < String.valueOf("Jumlah Meja").length()){
+                            spasi_jumlah_meja = String.valueOf("Jumlah Meja").length();
+                        }
                         spasi_jumlah_reservasi = Math.max(spasi_jumlah_reservasi, String.valueOf(b.getjumlah_reservasi()).length() + 2);
+                        if(spasi_jumlah_reservasi < String.valueOf("Jumlah Reservasi (orang)").length()){
+                            spasi_jumlah_reservasi = String.valueOf("Jumlah Reservasi (orang)").length();
+                        }
                     }
                     //mulai menampilkan data dengan tabel
                     System.out.println("Daftar Bioskop yang tersedia: ");
-                    for(int i = 0; i < spasi_alamat + spasi_nama_lounge + spasi_nama_restoran + spasi_kota + spasi_id + spasi_kapasitas_lounge + spasi_harga_tiket_premium + spasi_jumlah_meja + spasi_jumlah_reservasi + spasi_nama + spasi_jumlah + 153; i++){
-                        System.out.print("_");
+                    for(int i = 0; i < spasi_alamat + spasi_nama_lounge + spasi_nama_restoran + spasi_kota + spasi_id + spasi_kapasitas_lounge + spasi_harga_tiket_premium + spasi_jumlah_meja + spasi_jumlah_reservasi + spasi_nama + spasi_jumlah + 13; i++){
+                        System.out.print("-");
+                    }
+                    System.out.println();
+                    System.out.print("|ID");
+                    for(int i = 0; i < spasi_id - String.valueOf("ID").length(); i++){
+                        System.out.print(" ");
+                    }
+                    System.out.print("|Nama");
+                    for(int i = 0; i < spasi_nama - String.valueOf("Nama").length(); i++){
+                        System.out.print(" ");
+                    }
+                    System.out.print("|Alamat");
+                    for(int i = 0; i < spasi_alamat - String.valueOf("Alamat").length(); i++){
+                        System.out.print(" ");
+                    }
+                    System.out.print("|Jumlah Studio");
+                    for(int i = 0; i < spasi_jumlah - String.valueOf("Jumlah Studio").length(); i++){
+                        System.out.print(" ");
+                    }
+                    System.out.print("|kota");
+                    for(int i = 0; i < spasi_kota - String.valueOf("kota").length(); i++){
+                        System.out.print(" ");
+                    }
+                    System.out.print("|Nama Lounge");
+                    for(int i = 0; i < spasi_nama_lounge - String.valueOf("Nama_lounge").length(); i++){
+                        System.out.print(" ");
+                    }
+                    System.out.print("|Kapasitas Lounge");
+                    for(int i = 0; i < spasi_kapasitas_lounge - String.valueOf("Kapasitas Lounge").length(); i++){
+                        System.out.print(" ");
+                    }
+                    System.out.print("|Harga Tiket (Rp)");
+                    for(int i = 0; i < spasi_harga_tiket_premium - String.valueOf("Harga Tiket (Rp)").length(); i++){
+                        System.out.print(" ");
+                    }
+                    System.out.print("|Nama Restoran");
+                    for(int i = 0; i < spasi_nama_restoran - String.valueOf("Nama Restoran").length(); i++){
+                        System.out.print(" ");
+                    }
+                    System.out.print("|Jumlah Meja");
+                    for(int i = 0; i < spasi_jumlah_meja - String.valueOf("Jumlah Meja").length(); i++){
+                        System.out.print(" ");
+                    }
+                    System.out.print("|Jumlah Reservasi (orang)");
+                    for(int i = 0; i < spasi_jumlah_reservasi - String.valueOf("Jumlah Reservasi (orang)").length(); i++){
+                        System.out.print(" ");
+                    }
+                    
+                    System.out.print("|");
+                    System.out.println();
+                    for(int i = 0; i < spasi_alamat + spasi_nama_lounge + spasi_nama_restoran + spasi_kota + spasi_id + spasi_kapasitas_lounge + spasi_harga_tiket_premium + spasi_jumlah_meja + spasi_jumlah_reservasi + spasi_nama + spasi_jumlah + 13; i++){
+                        System.out.print("-");
                     }
                     System.out.println();
                     for(BioskopLuxury B : daftarBioskop){
-                        System.out.print("|Id: " + B.getid());
+                        System.out.print("|" + B.getid());
                         for(int i = 0; i < spasi_id - String.valueOf(B.getid()).length(); i++){
                             System.out.print(" ");
                         }
-                        System.out.print("|Nama: " + B.getnama());
+                        System.out.print("|" + B.getnama());
                         for(int i = 0; i < spasi_nama - B.getnama().length(); i++){
                             System.out.print(" ");
                         }
-                        System.out.print("|Alamat: " + B.getalamat());
+                        System.out.print("|" + B.getalamat());
                         for(int i = 0; i < spasi_alamat - B.getalamat().length(); i++){
                             System.out.print(" ");
                         }
-                        System.out.print("|Jumlah studio: " + B.getjumlah_studio());
+                        System.out.print("|" + B.getjumlah_studio());
                         for(int i = 0; i < spasi_jumlah - String.valueOf(B.getjumlah_studio()).length(); i++){
                             System.out.print(" ");
                         }
-                        System.out.print("|Kota: " + B.getkota());
+                        System.out.print("|" + B.getkota());
                         for(int i = 0; i < spasi_kota - B.getkota().length(); i++){
                             System.out.print(" ");
                         }
-                        System.out.print("|Nama lounge: " + B.getnama_lounge());
+                        System.out.print("|" + B.getnama_lounge());
                         for(int i = 0; i < spasi_nama_lounge - B.getnama_lounge().length(); i++){
                             System.out.print(" ");
                         }
-                        System.out.print("|Kapasitas lounge: " + B.getkapasitas_lounge());
+                        System.out.print("|" + B.getkapasitas_lounge());
                         for(int i = 0; i < spasi_kapasitas_lounge - String.valueOf(B.getkapasitas_lounge()).length(); i++){
                             System.out.print(" ");
                         }
-                        System.out.print("|Harga tiket premium: Rp. " + B.getharga_tiket_premium());
+                        System.out.print("|" + B.getharga_tiket_premium());
                         for(int i = 0; i < spasi_harga_tiket_premium - String.valueOf(B.getharga_tiket_premium()).length(); i++){
                             System.out.print(" ");
                         }
-                        System.out.print("|Nama restoran: " + B.getnama_restoran());
-                        for(int i = 0; i < spasi_nama_restoran - B.getnama_restoran().length(); i++){
+                        System.out.print("|" + B.getnama_restoran());
+                        for(int i = 0; i < (spasi_nama_restoran + 1) - B.getnama_restoran().length(); i++){
                             System.out.print(" ");
                         }
-                        System.out.print("|Jumlah meja: " + B.getjumlah_meja());
+                        System.out.print("|" + B.getjumlah_meja());
                         for(int i = 0; i < spasi_jumlah_meja - String.valueOf(B.getjumlah_meja()).length(); i++){
                             System.out.print(" ");
                         }
-                        System.out.print("|Jumlah reservasi: " + B.getjumlah_reservasi());
+                        System.out.print("|" + B.getjumlah_reservasi());
                         for(int i = 0; i < spasi_jumlah_reservasi - String.valueOf(B.getjumlah_reservasi()).length(); i++){
                             System.out.print(" ");
                         }
                         System.out.print("|");
                         System.out.println();
-                        for(int i = 0; i < spasi_alamat + spasi_nama_lounge + spasi_nama_restoran + spasi_kota + spasi_id + spasi_kapasitas_lounge + spasi_harga_tiket_premium + spasi_jumlah_meja + spasi_jumlah_reservasi + spasi_nama + spasi_jumlah + 153; i++){
+                        for(int i = 0; i < spasi_alamat + spasi_nama_lounge + spasi_nama_restoran + spasi_kota + spasi_id + spasi_kapasitas_lounge + spasi_harga_tiket_premium + spasi_jumlah_meja + spasi_jumlah_reservasi + spasi_nama + spasi_jumlah + 13; i++){
                         System.out.print("-");
                         }
                         System.out.println();
