@@ -7,11 +7,11 @@ public class Bioskop {
     private String kota;
     
     //sebuah konstruk untuk class Bioskop
-    Bioskop(){
+    public Bioskop(){
 
     }
     //konstruk juga tetapi dengan meminta masukan juga agar data bisa langsung terisi
-    Bioskop(int id, String nama, String alamat, int jumlah_studio, String kota){
+    public Bioskop(int id, String nama, String alamat, int jumlah_studio, String kota){
         this.id = id;
         this.nama = nama;
         this.alamat = alamat;
