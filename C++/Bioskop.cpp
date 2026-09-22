@@ -1,3 +1,6 @@
+#include <iostream>
+#include <string>
+
 using namespace std;
 
 //deklarasi kelas baru dengan nama Bioskop
