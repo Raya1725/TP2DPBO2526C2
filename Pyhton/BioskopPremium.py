@@ -1,12 +1,15 @@
 from Bioskop import Bioskop
 
+#deklarasi untuk class BioskopPremium yang inheritage dengan class bioskopa
 class BioskopPremium(Bioskop) :
+    #sebuah konstruktor untuk kelas ini dengan parameter sebagai berikut
     def __init__(self, id, nama, alamat, jumlah_studio, kota, nama_lounge, kapasitas_lounge, harga_tiket_premium):
         super().__init__(id, nama, alamat, jumlah_studio, kota)
         self.__nama_lounge = nama_lounge
         self.__kapasitas_lounge = kapasitas_lounge
         self.__harga_tiket_premium = harga_tiket_premium
 
+    #kumpulan method getset untuk setiap atribut
     def getnamalounge(self):
         return self.__nama_lounge
     
