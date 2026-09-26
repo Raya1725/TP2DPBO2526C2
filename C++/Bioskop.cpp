@@ -1,6 +1,3 @@
-#include <iostream>
-#include <string>
-
 using namespace std;
 
 //deklarasi kelas baru dengan nama Bioskop
@@ -58,4 +55,7 @@ class Bioskop {
         string getkota(){
             return this->kota;
         }
+
+        //deconstruct untuk class Bioskop
+        ~Bioskop(){}
 };

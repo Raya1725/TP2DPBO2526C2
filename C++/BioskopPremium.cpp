@@ -1,5 +1,3 @@
-#include <iostream>
-#include <string>
 #include "Bioskop.cpp"
 
 using namespace std;
@@ -45,5 +43,7 @@ class BioskopPremium : public Bioskop{
         double gethargatiket(){
             return this->harga_tiket;
         }
+
+        ~BioskopPremium(){}
         
 };
