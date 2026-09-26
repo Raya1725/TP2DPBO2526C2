@@ -7,7 +7,7 @@
         private int $jumlah_studio;
         private string $kota;
         private ?string $gambar;
-        public function __construct(int $id, string $nama, string $alamat, int $jumlah_studio, string $kota, ?string $gambar = null){
+        public function __construct($id, $nama, $alamat, $jumlah_studio,$kota, $gambar = null){
             $this->id = $id;
             $this->nama = $nama;
             $this->alamat = $alamat;

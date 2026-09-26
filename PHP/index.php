@@ -1,22 +1,42 @@
 <?php
-// class Bioskop WAJIB sudah dikenal SEBELUM session_start(), supaya PHP bisa
-// meng-unserialize object Bioskop yang tersimpan di $_SESSION dari request sebelumnya
+// Class WAJIB sudah dikenal SEBELUM session_start(), supaya PHP bisa
+// meng-unserialize object yang tersimpan di $_SESSION dari request sebelumnya.
+// Urutan require harus dari parent ke child: Bioskop -> BioskopPremium -> BioskopLuxury.
 require_once __DIR__ . '/Bioskop.php';
+require_once __DIR__ . '/BioskopPremium.php';
+require_once __DIR__ . '/BioskopLuxury.php';
 
 session_start();
 
-if (!isset($_SESSION['daftarBioskop'])) {
-    $_SESSION['daftarBioskop'] = [];
+// 5 data awal, disamakan dengan 5 data awal di Main.java.
+// Dibungkus fungsi supaya bisa dipanggil ulang saat reset, bukan cuma sekali di awal.
+function dataAwalBioskop(): array {
+    return [
+        new BioskopLuxury(1, "XXI", "JL Kolmas", 7, "Bandung", "uploads/XXI.jpg", "Lounge Bahari", 12, 1200000, "LA Beau", 5, 3),
+        new BioskopLuxury(2, "CGV", "JL SumurBor", 6, "Bandung", "uploads/CGV.jpg", "Lounge Bihara", 8, 150000, "LA BauBau", 10, 15),
+        new BioskopLuxury(3, "Cinepolis", "JL Sumbang", 8, "Jakarta", "uploads/Cinepolis.jpg", "Lounge bambang", 2, 80000, "Mang Bahar", 20, 2),
+        new BioskopLuxury(4, "Reynema", "JL Cimareme", 10, "Bandung", "uploads/Reynema.jpg", "Lounge Sultan", 20, 200000, "LA LA LA", 20, 21),
+        new BioskopLuxury(5, "NoeNema", "JL Cantik", 17, "Bandung", "uploads/NoeNema.jpg", "Lounge Beautiful", 17, 170307, "LA Pretty", 17, 17),
+    ];
 }
 
-// Jaga-jaga: kalau ada data lama di session yang formatnya BUKAN object Bioskop
-// (misal peninggalan versi kode sebelumnya yang masih pakai array), reset otomatis
-// supaya tidak menyebabkan fatal error "Call to a member function ... on array"
+// Pakai empty(), bukan isset(): isset() tetap true walau isinya array kosong []
+// (misal peninggalan session lama), sehingga 5 data awal tidak pernah terisi ulang.
+if (empty($_SESSION['daftarBioskop'])) {
+    $_SESSION['daftarBioskop'] = dataAwalBioskop();
+}
+
+// Jaga-jaga: kalau ada data lama di session yang formatnya BUKAN object BioskopLuxury
+// (misal peninggalan versi kode sebelumnya), reset otomatis ke 5 data awal supaya
+// tidak menyebabkan fatal error "Call to a member function ... on <tipe lain>"
+$adaDataTidakValid = false;
 foreach ($_SESSION['daftarBioskop'] as $item) {
-    if (!($item instanceof Bioskop)) {
-        $_SESSION['daftarBioskop'] = [];
-        break;
+    if (!($item instanceof BioskopLuxury)) {
+        $adaDataTidakValid = true;
     }
+}
+if ($adaDataTidakValid) {
+    $_SESSION['daftarBioskop'] = dataAwalBioskop();
 }
 
 $direktoriUpload = __DIR__ . '/uploads/';
@@ -46,6 +66,16 @@ function simpanGambar($fileInput, $direktoriUpload) {
     return false;
 }
 
+// Mencari objek BioskopLuxury berdasarkan id dalam daftar.
+function cariBioskopById(array $daftar, $id): ?BioskopLuxury {
+    foreach ($daftar as $b) {
+        if ($b->getid() === $id) {
+            return $b;
+        }
+    }
+    return null;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $aksi = $_POST['aksi'] ?? '';
 
@@ -56,139 +86,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $alamat = trim($_POST['alamat'] ?? '');
         $jumlahStudio = filter_var($_POST['jumlah_studio'] ?? '', FILTER_VALIDATE_INT);
         $kota = trim($_POST['kota'] ?? '');
+        $namaLounge = trim($_POST['nama_lounge'] ?? '');
+        $kapasitasLounge = filter_var($_POST['kapasitas_lounge'] ?? '', FILTER_VALIDATE_INT);
+        $hargaTiketPremium = filter_var($_POST['harga_tiket_premium'] ?? '', FILTER_VALIDATE_FLOAT);
+        $namaRestoran = trim($_POST['nama_restoran'] ?? '');
+        $jumlahMeja = filter_var($_POST['jumlah_meja'] ?? '', FILTER_VALIDATE_INT);
+        $jumlahReservasi = filter_var($_POST['jumlah_reservasi'] ?? '', FILTER_VALIDATE_INT);
 
         if ($id === false) {
             $pesanError = 'Id harus berupa angka.';
         } elseif ($jumlahStudio === false) {
             $pesanError = 'Jumlah studio harus berupa angka.';
-        } elseif ($nama === '' || $alamat === '' || $kota === '') {
-            $pesanError = 'Nama, alamat, dan kota wajib diisi.';
+        } elseif ($kapasitasLounge === false) {
+            $pesanError = 'Kapasitas lounge harus berupa angka.';
+        } elseif ($hargaTiketPremium === false) {
+            $pesanError = 'Harga tiket premium harus berupa angka.';
+        } elseif ($jumlahMeja === false) {
+            $pesanError = 'Jumlah meja harus berupa angka.';
+        } elseif ($jumlahReservasi === false) {
+            $pesanError = 'Jumlah reservasi harus berupa angka.';
+        } elseif ($nama === '' || $alamat === '' || $kota === '' || $namaLounge === '' || $namaRestoran === '') {
+            $pesanError = 'Nama, alamat, kota, nama lounge, dan nama restoran wajib diisi.';
+        } elseif (cariBioskopById($_SESSION['daftarBioskop'], $id) !== null) {
+            $pesanError = 'Id sudah ada, gunakan id lain.';
         } else {
-            // cek apakah id sudah dipakai bioskop lain
-            $idSudahAda = false;
-            foreach ($_SESSION['daftarBioskop'] as $b) {
-                if ($b->getid() === $id) {
-                    $idSudahAda = true;
-                    break;
-                }
-            }
-            if ($idSudahAda) {
-                $pesanError = 'Id sudah ada, gunakan id lain.';
+            $pathGambar = simpanGambar($_FILES['gambar'] ?? null, $direktoriUpload);
+            if ($pathGambar === false) {
+                $pesanError = 'Gambar harus berformat jpg, jpeg, png, gif, atau webp.';
             } else {
-                $pathGambar = simpanGambar($_FILES['gambar'] ?? null, $direktoriUpload);
-                if ($pathGambar === false) {
-                    $pesanError = 'Gambar harus berformat jpg, jpeg, png, gif, atau webp.';
-                } else {
-                    $bioskopBaru = new Bioskop($id, $nama, $alamat, $jumlahStudio, $kota, $pathGambar);
-                    $_SESSION['daftarBioskop'][] = $bioskopBaru;
-                    $pesan = 'Data berhasil dimasukan.';
-                }
+                $bioskopBaru = new BioskopLuxury(
+                    $id, $nama, $alamat, $jumlahStudio, $kota, $pathGambar,
+                    $namaLounge, $kapasitasLounge, $hargaTiketPremium,
+                    $namaRestoran, $jumlahMeja, $jumlahReservasi
+                );
+                $_SESSION['daftarBioskop'][] = $bioskopBaru;
+                $pesan = 'data berhasil dimasukan coyy uhuyyy geloo brutal';
             }
-        }
-    }
-
-    // ================= UPDATE =================
-    elseif ($aksi === 'update') {
-        $id = filter_var($_POST['id'] ?? '', FILTER_VALIDATE_INT);
-        $ketemu = false;
-        // objek PHP selalu dipegang lewat "handle", jadi memanggil setter pada $b
-        // di dalam foreach ini otomatis mengubah objek asli di dalam $_SESSION
-        foreach ($_SESSION['daftarBioskop'] as $b) {
-            if ($b->getid() === $id) {
-                $ketemu = true;
-                $nama = trim($_POST['nama'] ?? '');
-                $alamat = trim($_POST['alamat'] ?? '');
-                $jumlahStudio = filter_var($_POST['jumlah_studio'] ?? '', FILTER_VALIDATE_INT);
-                $kota = trim($_POST['kota'] ?? '');
-
-                if ($jumlahStudio === false) {
-                    $pesanError = 'Jumlah studio harus berupa angka.';
-                    break;
-                }
-                if ($nama === '' || $alamat === '' || $kota === '') {
-                    $pesanError = 'Nama, alamat, dan kota wajib diisi.';
-                    break;
-                }
-
-                $pathGambarBaru = simpanGambar($_FILES['gambar'] ?? null, $direktoriUpload);
-                if ($pathGambarBaru === false) {
-                    $pesanError = 'Gambar harus berformat jpg, jpeg, png, gif, atau webp.';
-                    break;
-                }
-
-                $b->setnama($nama);
-                $b->setalamat($alamat);
-                $b->setjumlah_studio($jumlahStudio);
-                $b->setkota($kota);
-                if ($pathGambarBaru !== null) {
-                    $b->setgambar($pathGambarBaru); // ganti gambar hanya kalau user upload yang baru
-                }
-                $pesan = 'Data berhasil diubah.';
-                break;
-            }
-        }
-        if (!$ketemu && $pesanError === '') {
-            $pesanError = 'Data dengan id tersebut tidak ditemukan.';
         }
     }
 
     // ================= RESET SESSION =================
     elseif ($aksi === 'reset') {
-        // hapus juga semua file gambar fisik di folder uploads/ milik data yang direset
+        // hapus file gambar fisik di folder uploads/ HANYA untuk gambar hasil upload user
+        // (dibuat oleh simpanGambar(), nama filenya selalu diawali "bioskop_").
+        // Gambar 5 data awal (uploads/XXI.jpg, dst.) sengaja tidak dihapus karena bukan
+        // hasil upload, jadi tidak boleh ikut terhapus saat reset.
         foreach ($_SESSION['daftarBioskop'] as $b) {
             $gambarLama = $b->getgambar();
-            if ($gambarLama !== null && file_exists(__DIR__ . '/' . $gambarLama)) {
+            $namaFileGambar = $gambarLama !== null ? basename($gambarLama) : null;
+            $adalahHasilUpload = $namaFileGambar !== null && str_starts_with($namaFileGambar, 'bioskop_');
+            if ($adalahHasilUpload && file_exists(__DIR__ . '/' . $gambarLama)) {
                 unlink(__DIR__ . '/' . $gambarLama);
             }
         }
-        $_SESSION['daftarBioskop'] = [];
-        $pesan = 'Semua data berhasil direset.';
-    }
-
-    // ================= DELETE =================
-    elseif ($aksi === 'delete') {
-        $id = filter_var($_POST['id'] ?? '', FILTER_VALIDATE_INT);
-        $ketemu = false;
-        foreach ($_SESSION['daftarBioskop'] as $index => $b) {
-            if ($b->getid() === $id) {
-                // hapus juga file gambar fisiknya dari folder uploads/, kalau ada
-                $gambarLama = $b->getgambar();
-                if ($gambarLama !== null && file_exists(__DIR__ . '/' . $gambarLama)) {
-                    unlink(__DIR__ . '/' . $gambarLama);
-                }
-                unset($_SESSION['daftarBioskop'][$index]);
-                $_SESSION['daftarBioskop'] = array_values($_SESSION['daftarBioskop']);
-                $ketemu = true;
-                $pesan = 'Data berhasil dihapus.';
-                break;
-            }
-        }
-        if (!$ketemu) {
-            $pesanError = 'Data dengan id tersebut tidak ditemukan.';
-        }
-    }
-}
-
-// ================= SEARCH (lewat GET, tidak mengubah data) =================
-$kataKunci = trim($_GET['cari'] ?? '');
-$dataTampil = $_SESSION['daftarBioskop'];
-if ($kataKunci !== '') {
-    $dataTampil = array_values(array_filter($dataTampil, function (Bioskop $b) use ($kataKunci) {
-        return (string)$b->getid() === $kataKunci
-            || stripos($b->getnama(), $kataKunci) !== false
-            || stripos($b->getkota(), $kataKunci) !== false;
-    }));
-}
-
-// Data yang mau diedit (kalau user klik tombol Edit) diambil lewat ?edit=id di URL
-$dataEdit = null;
-if (isset($_GET['edit'])) {
-    $idEdit = filter_var($_GET['edit'], FILTER_VALIDATE_INT);
-    foreach ($_SESSION['daftarBioskop'] as $b) {
-        if ($b->getid() === $idEdit) {
-            $dataEdit = $b;
-            break;
-        }
+        $_SESSION['daftarBioskop'] = dataAwalBioskop();
+        $pesan = 'Semua data berhasil direset ke 5 data awal.';
     }
 }
 ?>
@@ -223,7 +175,7 @@ if (isset($_GET['edit'])) {
         line-height: 1.5;
     }
     .wrap{
-        max-width: 1100px;
+        max-width: 1300px;
         margin: 0 auto;
         padding: 40px 24px 80px;
     }
@@ -322,39 +274,26 @@ if (isset($_GET['edit'])) {
         font-weight: 600;
         cursor: pointer;
     }
-    button.secondary{
-        background: transparent;
-        color: var(--text-dim);
-        border: 1px solid var(--line);
-    }
     button.danger{
         background: var(--danger);
         color: #fff0e9;
     }
-    a.link{
-        color: var(--marquee);
-        text-decoration: none;
-        font-family: 'Helvetica Neue', Arial, sans-serif;
-        font-size: 0.85rem;
-    }
 
-    .search-row{
-        display: flex;
-        gap: 10px;
+    .table-scroll{
+        overflow-x: auto;
     }
-    .search-row input{ flex: 1; }
-
     table{
         width: 100%;
         border-collapse: collapse;
         font-family: 'Helvetica Neue', Arial, sans-serif;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
     }
     thead th{
         text-align: left;
         text-transform: uppercase;
         letter-spacing: 0.8px;
-        font-size: 0.72rem;
+        font-size: 0.68rem;
         color: var(--text-dim);
         border-bottom: 1px solid var(--line);
         padding: 10px 12px;
@@ -377,37 +316,17 @@ if (isset($_GET['edit'])) {
         border-radius: var(--radius);
         border: 1px dashed var(--line);
         display: flex; align-items: center; justify-content: center;
-        font-size: 0.65rem;
+        font-size: 0.6rem;
         color: var(--text-dim);
         text-align: center;
+        white-space: normal;
     }
-    .row-actions{ display: flex; gap: 8px; }
-    .row-actions button, .row-actions a{ padding: 6px 12px; font-size: 0.78rem; }
     .kosong{
         color: var(--text-dim);
         font-family: 'Helvetica Neue', Arial, sans-serif;
         font-size: 0.9rem;
         padding: 24px 0;
     }
-
-    .modal-bg{
-        display: none;
-        position: fixed; inset: 0;
-        background: rgba(0,0,0,0.6);
-        align-items: center; justify-content: center;
-        padding: 20px;
-        z-index: 10;
-    }
-    .modal-bg.tampil{ display: flex; }
-    .modal{
-        background: var(--bg-panel);
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        padding: 28px;
-        max-width: 520px;
-        width: 100%;
-    }
-    .modal h2{ margin-top: 0; }
 </style>
 </head>
 <body>
@@ -415,7 +334,7 @@ if (isset($_GET['edit'])) {
 
     <header>
         <h1>Layar Tayang</h1>
-        <p>Pencatatan data bioskop — disimpan sementara di session, bukan database.</p>
+        <p>Pencatatan data bioskop luxury — disimpan sementara di session, bukan database.</p>
         <div class="bulb-row">
             <span></span><span></span><span></span><span></span><span></span>
             <span></span><span></span><span></span><span></span><span></span>
@@ -459,6 +378,30 @@ if (isset($_GET['edit'])) {
                     <input type="text" id="kota" name="kota" required>
                 </div>
                 <div>
+                    <label for="nama_lounge">Nama Lounge</label>
+                    <input type="text" id="nama_lounge" name="nama_lounge" required>
+                </div>
+                <div>
+                    <label for="kapasitas_lounge">Kapasitas Lounge</label>
+                    <input type="number" id="kapasitas_lounge" name="kapasitas_lounge" required>
+                </div>
+                <div>
+                    <label for="harga_tiket_premium">Harga Tiket Premium (Rp)</label>
+                    <input type="number" id="harga_tiket_premium" name="harga_tiket_premium" step="any" required>
+                </div>
+                <div>
+                    <label for="nama_restoran">Nama Restoran</label>
+                    <input type="text" id="nama_restoran" name="nama_restoran" required>
+                </div>
+                <div>
+                    <label for="jumlah_meja">Jumlah Meja</label>
+                    <input type="number" id="jumlah_meja" name="jumlah_meja" required>
+                </div>
+                <div>
+                    <label for="jumlah_reservasi">Jumlah Reservasi (orang)</label>
+                    <input type="number" id="jumlah_reservasi" name="jumlah_reservasi" required>
+                </div>
+                <div>
                     <label for="gambar">Gambar (jpg, png, gif, webp)</label>
                     <input type="file" id="gambar" name="gambar" accept="image/*">
                 </div>
@@ -470,38 +413,31 @@ if (isset($_GET['edit'])) {
     </section>
 
     <section>
-        <h2>Cari Data</h2>
-        <form class="panel search-row" method="GET">
-            <input type="text" name="cari" placeholder="Cari berdasarkan id, nama, atau kota" value="<?= htmlspecialchars($kataKunci) ?>">
-            <button type="submit" class="secondary">Cari</button>
-            <?php if ($kataKunci !== ''): ?>
-                <a class="link" href="index.php" style="align-self:center;">Reset</a>
-            <?php endif; ?>
-        </form>
-    </section>
+        <h2>Daftar Bioskop</h2>
 
-    <section>
-        <h2>Daftar Bioskop <?= $kataKunci !== '' ? '— hasil pencarian "' . htmlspecialchars($kataKunci) . '"' : '' ?></h2>
-
-        <?php if (empty($dataTampil)): ?>
-            <p class="kosong">
-                <?= empty($_SESSION['daftarBioskop']) ? 'Belum ada data. Tambahkan data baru di atas.' : 'Data tidak ditemukan.' ?>
-            </p>
+        <?php if (empty($_SESSION['daftarBioskop'])): ?>
+            <p class="kosong">Kosong loh yahhh</p>
         <?php else: ?>
+            <div class="table-scroll">
             <table>
                 <thead>
                     <tr>
                         <th>Gambar</th>
-                        <th>Id</th>
+                        <th>ID</th>
                         <th>Nama</th>
                         <th>Alamat</th>
                         <th>Jumlah Studio</th>
                         <th>Kota</th>
-                        <th>Aksi</th>
+                        <th>Nama Lounge</th>
+                        <th>Kapasitas Lounge</th>
+                        <th>Harga Tiket (Rp)</th>
+                        <th>Nama Restoran</th>
+                        <th>Jumlah Meja</th>
+                        <th>Jumlah Reservasi (orang)</th>
                     </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($dataTampil as $b): ?>
+                <?php foreach ($_SESSION['daftarBioskop'] as $b): ?>
                     <tr>
                         <td>
                             <?php if ($b->getgambar() !== null && file_exists(__DIR__ . '/' . $b->getgambar())): ?>
@@ -515,60 +451,20 @@ if (isset($_GET['edit'])) {
                         <td><?= htmlspecialchars($b->getalamat()) ?></td>
                         <td><?= htmlspecialchars($b->getjumlah_studio()) ?></td>
                         <td><?= htmlspecialchars($b->getkota()) ?></td>
-                        <td class="row-actions">
-                            <a href="?edit=<?= $b->getid() ?>"><button type="button" class="secondary">Edit</button></a>
-                            <form method="POST" onsubmit="return confirm('Yakin hapus data ini?');" style="display:inline;">
-                                <input type="hidden" name="aksi" value="delete">
-                                <input type="hidden" name="id" value="<?= $b->getid() ?>">
-                                <button type="submit" class="danger">Hapus</button>
-                            </form>
-                        </td>
+                        <td><?= htmlspecialchars($b->getnamalounge()) ?></td>
+                        <td><?= htmlspecialchars($b->getkapasitas()) ?></td>
+                        <td><?= htmlspecialchars($b->gethargatiketpremium()) ?></td>
+                        <td><?= htmlspecialchars($b->getnamarestoran()) ?></td>
+                        <td><?= htmlspecialchars($b->getjumlahmeja()) ?></td>
+                        <td><?= htmlspecialchars($b->getjumlahreservasi()) ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
         <?php endif; ?>
     </section>
 
 </div>
-
-<?php if ($dataEdit): ?>
-<div class="modal-bg tampil">
-    <div class="modal">
-        <h2>Ubah Data — Id <?= htmlspecialchars($dataEdit->getid()) ?></h2>
-        <form method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="aksi" value="update">
-            <input type="hidden" name="id" value="<?= htmlspecialchars($dataEdit->getid()) ?>">
-            <div class="grid">
-                <div>
-                    <label for="e_nama">Nama Bioskop</label>
-                    <input type="text" id="e_nama" name="nama" value="<?= htmlspecialchars($dataEdit->getnama()) ?>" required>
-                </div>
-                <div>
-                    <label for="e_alamat">Alamat</label>
-                    <input type="text" id="e_alamat" name="alamat" value="<?= htmlspecialchars($dataEdit->getalamat()) ?>" required>
-                </div>
-                <div>
-                    <label for="e_jumlah_studio">Jumlah Studio</label>
-                    <input type="number" id="e_jumlah_studio" name="jumlah_studio" value="<?= htmlspecialchars($dataEdit->getjumlah_studio()) ?>" required>
-                </div>
-                <div>
-                    <label for="e_kota">Kota</label>
-                    <input type="text" id="e_kota" name="kota" value="<?= htmlspecialchars($dataEdit->getkota()) ?>" required>
-                </div>
-                <div>
-                    <label for="e_gambar">Ganti Gambar (kosongkan jika tidak diubah)</label>
-                    <input type="file" id="e_gambar" name="gambar" accept="image/*">
-                </div>
-            </div>
-            <div class="actions">
-                <button type="submit">Simpan Perubahan</button>
-                <a class="link" href="index.php">Batal</a>
-            </div>
-        </form>
-    </div>
-</div>
-<?php endif; ?>
-
 </body>
 </html>
