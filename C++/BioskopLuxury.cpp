@@ -3,6 +3,7 @@
 using namespace std;
 
 //deklarasi class Bioskop Luxury yang inheritage dengan kelas Bioskop premium
+//disini class BioskopPremium sudah inheritage dengan class bioskop jadi ini multilevel inheritage
 class BioskopLuxury : public BioskopPremium {
     private : 
         //macam macam atribut yang ada di class ini
