@@ -3,27 +3,33 @@
 #include <algorithm>
 #include <string>
 #include <limits>
-#include "Bioskop.cpp"
+#include "BioskopLuxury.cpp"
 using namespace std;
 
 int main(){
 
     ios::sync_with_stdio(0);
-
     //deklarasi vector baru dengan nama daftar bioskop untuk menyimpan data bioskop
-    vector<Bioskop> daftarbioskop;  
+    vector<BioskopLuxury> daftarbioskop;
+    BioskopLuxury awal = BioskopLuxury(1, "XXI", "JL Kolmas", 7, "Bandung", "Lounge Bahari", 12, 120000, "LA Beau", 5, 3);
+    daftarbioskop.push_back(awal);
+    awal = BioskopLuxury(2, "CGV", "JL SumurBor", 6, "Bandung", "Lounge Bihara", 8, 150000, "LA Bau Bau", 10, 15);
+    daftarbioskop.push_back(awal);
+    awal = BioskopLuxury(3, "Cinepolis", "JL Sumbang", 8, "Jakarta", "Lounge Bambang", 2, 80000, "Mang Bahar", 20, 2);
+    daftarbioskop.push_back(awal);
+    awal = BioskopLuxury(4, "Reynema", "JL Cimareme", 10, "Bandung", "Lounge Sultan", 20, 200000, "LA LA LA", 20, 21);
+    daftarbioskop.push_back(awal);
+    awal = BioskopLuxury(5, "NoeNema", "JL Cantik", 17, "Bandung", "Lounge Beautiful", 17, 170307, "LA Pretty", 17, 17);
+    daftarbioskop.push_back(awal);
     string pilihan;
     cout << "<<<<<<<<<<<< Menu utak atik data bioskop >>>>>>>>>>>>>" << endl;
     cout << endl;
     cout << "insert: Untuk tambah data baru" << endl;
     cout << "show: Untuk menampilkan data yang ada" << endl;
-    cout << "Update: Untuk mengedit data yang ada" << endl;
-    cout << "Delete: Untuk menghapus data" << endl;
-    cout << "Search: untuk mencari data" << endl;
     cout << "Exit: Untuk keluar dari program" << endl;
     cout << "Help: untuk melihat perintah pada program ini" << endl;
     do{//perulangan do while atau meminta masukan dulu baru mengecek kondisi di akhir
-        vector<Bioskop>:: iterator iter = daftarbioskop.begin();//deklarasi iterator atau pengecek untuk vector daftarbioskop
+        vector<BioskopLuxury>:: iterator iter = daftarbioskop.begin();//deklarasi iterator atau pengecek untuk vector daftarbioskop
         cout << "masukan perintah: ";
         cin >> pilihan;//meminta masukan user
         //jika user memilih menu insert atau memasukan data ke dalam vector
@@ -86,10 +92,57 @@ int main(){
             cout << "Masukan Kota: ";
             string kota;
             getline(cin, kota);
+            cout << "Masukan nama lounge: ";
+            string nama_lounge;
+            getline(cin, nama_lounge);
+            cout << "Masukan kapasitas lounge: ";
+            int kapasitas_lounge;
+            cin >> kapasitas_lounge;
+            while (cin.fail()) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Masukan hanya angka: ";
+                cin >> kapasitas_lounge;
+            }
+            cin.ignore();
+            cout << "Masukan harga tiket premium: ";
+            double harga_tiket_premium;
+            cin >> harga_tiket_premium;
+            while (cin.fail()) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Masukan hanya angka: ";
+                cin >> harga_tiket_premium;
+            }
+            cin.ignore();
+            cout << "Masukan nama restoran: ";
+            string nama_restoran;
+            getline(cin, nama_restoran);
+            cout << "Masukan nama jumlah meja: ";
+            int jumlah_meja;
+            cin >> jumlah_meja;
+            while (cin.fail()) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Masukan hanya angka: ";
+                cin >> jumlah_meja;
+            }
+            cout << "Masukan jumlah_reservasi: ";
+            int jumlah_reservasi;
+            cin >> jumlah_reservasi;
+            while (cin.fail()) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Masukan hanya angka: ";
+                cin >> jumlah_reservasi;
+            }
+            cin.ignore();
+            // memasukan data yang dimasukan tadi ke dalam konstruk bioskop yang baru
+            BioskopLuxury B(id, nama, alamat, jumlah_studio, kota, nama_lounge, kapasitas_lounge,
+                            harga_tiket_premium, nama_restoran, jumlah_meja, jumlah_reservasi);
+            daftarbioskop.push_back(B);
+            cout << "data berhasil dimasukan coyy uhuyyy geloo brutal" << endl;
             //memasukan data dengan konstruk bioskopp baru lalu sekalian memasukan data kedalamnya
-            Bioskop B = Bioskop(id, nama, alamat, jumlah_studio, kota);
-            daftarbioskop.push_back(B);//memasukan data ke dalam vector
-            cout << "Data Berhasil Dimasukan, geloooo disini juga berhasill" << endl;
         }
         //salah satu opsi perintah, perintah inin adalah untuk menampikan semua data yang ada di vector
         else if(pilihan == "show" || pilihan == "Show"){
@@ -104,227 +157,138 @@ int main(){
                 int spasi_kota = 0;
                 int spasi_id = 0;
                 int spasi_jumlah = 0;
+                int spasi_nama_lounge = 0;
+                int spasi_kapasitas_lounge = 0;
+                int spasi_harga_tiket_premium = 0;
+                int spasi_nama_restoran = 0;
+                int spasi_jumlah_meja = 0;
+                int spasi_jumlah_reservasi = 0;
                 //perulangan for untuk melakukan perhitungan masing masing spasi
-                for (Bioskop B : daftarbioskop) {
-                    spasi_id     = max(spasi_id,     static_cast<int>(to_string(B.getid()).length() + 2));
-                    spasi_jumlah = max(spasi_jumlah, static_cast<int>(to_string(B.getjumlah_studio()).length() + 2));
-                    spasi_nama   = max(spasi_nama,   static_cast<int>(B.getnama().length() + 2));
-                    spasi_alamat = max(spasi_alamat, static_cast<int>(B.getalamat().length() + 2));
-                    spasi_kota   = max(spasi_kota,   static_cast<int>(B.getkota().length() + 2));
+                for (BioskopLuxury B : daftarbioskop) {
+                    spasi_id     = max({spasi_id,     static_cast<int>(to_string(B.getid()).length() + 2),     static_cast<int>(string("Id").length())});
+                    spasi_nama   = max({spasi_nama,   static_cast<int>(B.getnama().length() + 2),               static_cast<int>(string("Nama").length())});
+                    spasi_alamat = max({spasi_alamat, static_cast<int>(B.getalamat().length() + 2),             static_cast<int>(string("Alamat").length())});
+                    spasi_jumlah = max({spasi_jumlah, static_cast<int>(to_string(B.getjumlah_studio()).length() + 2), static_cast<int>(string("Jumlah Studio").length())});
+                    spasi_kota   = max({spasi_kota,   static_cast<int>(B.getkota().length() + 2),               static_cast<int>(string("Kota").length())});
+                    spasi_nama_lounge          = max({spasi_nama_lounge,          static_cast<int>(B.getnamalounge().length() + 2),          static_cast<int>(string("Nama Lounge").length())});
+                    spasi_kapasitas_lounge     = max({spasi_kapasitas_lounge,     static_cast<int>(to_string(B.getkapasitaslounge()).length() + 2), static_cast<int>(string("Kapasitas Lounge").length())});
+                    spasi_harga_tiket_premium  = max({spasi_harga_tiket_premium,  static_cast<int>(to_string(B.gethargatiket()).length() + 6), static_cast<int>(string("Harga Tiket").length())});
+                    spasi_nama_restoran        = max({spasi_nama_restoran,        static_cast<int>(B.getnamarestoran().length() + 2),        static_cast<int>(string("Nama Restoran").length())});
+                    spasi_jumlah_meja          = max({spasi_jumlah_meja,          static_cast<int>(to_string(B.getjumlahmeja()).length() + 2), static_cast<int>(string("Jumlah Meja").length())});
+                    spasi_jumlah_reservasi     = max({spasi_jumlah_reservasi,     static_cast<int>(to_string(B.getjumlahreservasi()).length() + 2), static_cast<int>(string("Jumlah Reservasi (orang)").length())});
                 }
-                //Menampilkan data Bioskop yang tersedia atau yang ada
-                //data ditampilkan dalam format tabel yang dinamis menyesuaikan panjang dari setiap data 
-                cout << "Daftar Bioskop yang Tersedia: " << endl;
-                for(int i = 0; i < spasi_alamat + spasi_kota + spasi_nama + 53; i++){
-                    cout << "_";
+
+                //mulai menampilkan data dengan tabel
+                cout << "Daftar Bioskop yang tersedia: " << endl;
+                for(int i = 0; i < spasi_alamat + spasi_nama_lounge + spasi_nama_restoran + spasi_kota + spasi_id + spasi_kapasitas_lounge + spasi_harga_tiket_premium + spasi_jumlah_meja + spasi_jumlah_reservasi + spasi_nama + spasi_jumlah + 7; i++){
+                    cout << "-";
                 }
                 cout << endl;
-                for(Bioskop B : daftarbioskop){
-                    cout << "|Id: " << B.getid();
-                    for(int i = 0; i < spasi_id - to_string(B.getid()).length(); i++){
+
+                cout << "|ID";
+                for(int i = 0; i < spasi_id - static_cast<int>(string("ID").length()); i++){
+                    cout << " ";
+                }
+                cout << "|Nama";
+                for(int i = 0; i < spasi_nama - static_cast<int>(string("Nama").length()); i++){
+                    cout << " ";
+                }
+                cout << "|Alamat";
+                for(int i = 0; i < spasi_alamat - static_cast<int>(string("Alamat").length()); i++){
+                    cout << " ";
+                }
+                cout << "|Jumlah Studio";
+                for(int i = 0; i < spasi_jumlah - static_cast<int>(string("Jumlah Studio").length()); i++){
+                    cout << " ";
+                }
+                cout << "|kota";
+                for(int i = 0; i < spasi_kota - static_cast<int>(string("kota").length()); i++){
+                    cout << " ";
+                }
+                cout << "|Nama Lounge";
+                for(int i = 0; i < spasi_nama_lounge - static_cast<int>(string("Nama_lounge").length()); i++){
+                    cout << " ";
+                }
+                cout << "|Kapasitas Lounge";
+                for(int i = 0; i < spasi_kapasitas_lounge - static_cast<int>(string("Kapasitas Lounge").length()); i++){
+                    cout << " ";
+                }
+                cout << "|Harga Tiket";
+                for(int i = 0; i < spasi_harga_tiket_premium - static_cast<int>(string("Harga Tiket").length() + 5); i++){
+                    cout << " ";
+                }
+                cout << "|Nama Restoran";
+                for(int i = 0; i < spasi_nama_restoran - static_cast<int>(string("Nama Restoran").length()); i++){
+                    cout << " ";
+                }
+                cout << "|Jumlah Meja";
+                for(int i = 0; i < spasi_jumlah_meja - static_cast<int>(string("Jumlah Meja").length()); i++){
+                    cout << " ";
+                }
+                cout << "|Jumlah Reservasi (orang)";
+                for(int i = 0; i < spasi_jumlah_reservasi - static_cast<int>(string("Jumlah Reservasi (orang)").length()); i++){
+                    cout << " ";
+                }
+                cout << "|";
+                cout << endl;
+
+                for(int i = 0; i < spasi_alamat + spasi_nama_lounge + spasi_nama_restoran + spasi_kota + spasi_id + spasi_kapasitas_lounge + spasi_harga_tiket_premium + spasi_jumlah_meja + spasi_jumlah_reservasi + spasi_nama + spasi_jumlah + 7; i++){
+                    cout << "-";
+                }
+                cout << endl;
+
+                for(BioskopLuxury B : daftarbioskop){
+                    cout << "|" << B.getid();
+                    for(int i = 0; i < spasi_id - static_cast<int>(to_string(B.getid()).length()); i++){
                         cout << " ";
                     }
-                    cout << "|Nama: " << B.getnama();
-                    for(int i = 0; i < spasi_nama - B.getnama().length(); i++){
+                    cout << "|" << B.getnama();
+                    for(int i = 0; i < spasi_nama - static_cast<int>(B.getnama().length()); i++){
                         cout << " ";
                     }
-                    cout << "|Alamat: " << B.getalamat();
-                    for(int i = 0; i < spasi_alamat - B.getalamat().length(); i++){
+                    cout << "|" << B.getalamat();
+                    for(int i = 0; i < spasi_alamat - static_cast<int>(B.getalamat().length()); i++){
                         cout << " ";
                     }
-                    cout << "|Jumlah_studio: " << B.getjumlah_studio();
-                    for(int i = 0; i < spasi_jumlah - to_string(B.getjumlah_studio()).length(); i++){
+                    cout << "|" << B.getjumlah_studio();
+                    for(int i = 0; i < spasi_jumlah - static_cast<int>(to_string(B.getjumlah_studio()).length()); i++){
                         cout << " ";
                     }
-                    cout << "|Kota: " << B.getkota();
-                    for(int i = 0; i < spasi_kota - B.getkota().length(); i++){
+                    cout << "|" << B.getkota();
+                    for(int i = 0; i < spasi_kota - static_cast<int>(B.getkota().length()); i++){
+                        cout << " ";
+                    }
+                    cout << "|" << B.getnamalounge();
+                    for(int i = 0; i < spasi_nama_lounge - static_cast<int>(B.getnamalounge().length()); i++){
+                        cout << " ";
+                    }
+                    cout << "|" << B.getkapasitaslounge();
+                    for(int i = 0; i < spasi_kapasitas_lounge - static_cast<int>(to_string(B.getkapasitaslounge()).length()); i++){
+                        cout << " ";
+                    }
+                    cout << "|" << B.gethargatiket();
+                    for(int i = 0; i < (spasi_harga_tiket_premium + 2) - static_cast<int>(to_string(B.gethargatiket()).length()); i++){
+                        cout << " ";
+                    }
+                    cout << "|" << B.getnamarestoran();
+                    for(int i = 0; i < spasi_nama_restoran - static_cast<int>(B.getnamarestoran().length()); i++){
+                        cout << " ";
+                    }
+                    cout << "|" << B.getjumlahmeja();
+                    for(int i = 0; i < spasi_jumlah_meja - static_cast<int>(to_string(B.getjumlahmeja()).length()); i++){
+                        cout << " ";
+                    }
+                    cout << "|" << B.getjumlahreservasi();
+                    for(int i = 0; i < spasi_jumlah_reservasi - static_cast<int>(to_string(B.getjumlahreservasi()).length()); i++){
                         cout << " ";
                     }
                     cout << "|";
                     cout << endl;
-                }
-                for(int i = 0; i < spasi_alamat + spasi_kota + spasi_nama + 53; i++){
-                    cout << "-";
-                }
-                cout << endl;
-            }
-        }
-        //salah satu opsi perintah yaitu update
-        //update adalah mengedit isi atribut dari suatu data seperti nama, alamat dll
-        //algoritma update menggunakan id sebagai parameter data mana yang mau di ubah
-        else if(pilihan == "update" || pilihan == "Update"){
-            cout << "Masukan id bioskop yang mau diubah: ";
-            int ubah = 0;
-            cin >> ubah;
-            while(cin.fail()){
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cout << "Masukan hanya angka: ";
-                cin >> ubah;
-            }
-            bool ketemu = false;
-            iter = daftarbioskop.begin();
-            //perulangan sampai bertemu data yang sesuai dengan id yang dimasukan
-            //jika tidak ketemu maka algoritma akan mengeluarkan kalimat bahwa data tidak ditemukan
-            while(ketemu == false && iter != daftarbioskop.end()){
-                Bioskop &B = *iter;
-                if(B.getid() == ubah){//kondisi jika data ditemukan
-                    ketemu = true;
-                    //disini saya memberikan banyak opsi untuk data apa yang mau diubah
-                    /*
-                    contohnya jika user memasukan nomor 1, maka user akan diminta
-                    memasukan nama baru untuk mengganti nama yang ada di dalam vector
-                    */
-                    cout << "apa yang mau diubah: " << endl;
-                    cout << "1, Nama: " << endl;
-                    cout << "2, Alamat: " << endl;
-                    cout << "3, Jumlah Studio: " << endl;
-                    cout << "4, Kota: " << endl;
-                    cout << "5, semua (Kecuali id): " << endl;
-                    cout << "Masukan Nomor: ";
-                    int update_pilihan;
-                    cin >> update_pilihan;
-                    while(cin.fail()){
-                        cin.clear();
-                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                        cout << "Masukan hanya angka: ";
-                        cin >> update_pilihan;
+                    for(int i = 0; i < spasi_alamat + spasi_nama_lounge + spasi_nama_restoran + spasi_kota + spasi_id + spasi_kapasitas_lounge + spasi_harga_tiket_premium + spasi_jumlah_meja + spasi_jumlah_reservasi + spasi_nama + spasi_jumlah + 7; i++){
+                        cout << "-";
                     }
-                    cin.ignore();
-                    //berbagai kondisi sesuai apa yang dipilih oleh user
-                    if(update_pilihan == 1){
-                        cout << "Masukan nama: ";
-                        string nama;
-                        getline(cin, nama);
-                        B.setnama(nama);
-                        cout << "Pergantian nama berhasil...." << endl;
-                    }
-                    else if(update_pilihan == 2){
-                        cout << "Masukan alamat: ";
-                        string alamat;
-                        getline(cin, alamat);
-                        B.setalamat(alamat);
-                        cout << "Pergantian alamat berhasil...." << endl;
-                    }
-                    else if(update_pilihan == 3){
-                        cout << "Masukan jumlah studio: ";
-                        int jumlah;
-                        cin >> jumlah;
-                        while(cin.fail()){
-                            cin.clear();
-                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            cout << "Masukan hanya angka: ";
-                            cin >> jumlah;
-                        }
-                        cin.ignore();
-                        B.setjumlah_studio(jumlah);
-                        cout << "Pergantian jumlah studio berhasil...." << endl;
-                    }
-                    else if(update_pilihan == 4){
-                        cout << "Masukan kota: ";
-                        string kota;
-                        getline(cin, kota);
-                        B.setkota(kota);
-                        cout << "Pergantian kota berhasil...." << endl;
-                    }
-                    else if(update_pilihan == 5){
-                        cout << "Masukan nama: " ;
-                        string semua;
-                        getline(cin, semua);
-                        B.setnama(semua);
-                        cout << "Masukan alamat: ";
-                        getline(cin, semua);
-                        B.setalamat(semua);
-                        int angka;
-                        cout << "Masukan jumlah studio: ";
-                        cin >> angka;
-                        while(cin.fail()){
-                            cin.clear();
-                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            cout << "Masukan hanya angka: ";
-                            cin >> angka;
-                        }
-                        cin.ignore();
-                        B.setjumlah_studio(angka);
-                        cout << "Masukan jumlah kota: ";
-                        getline(cin, semua);
-                        B.setkota(semua);
-                        cout << "Pergantian seluruh data berhasil...." << endl;
-                    }
+                    cout << endl;
                 }
-                //jika data tidak ditemukan maka iterator akan maju
-                else{
-                    iter++;
-                }
-            }
-            if(ketemu == false){
-                cout << "data tidak ditemukan....." << endl;
-            }
-        }
-        //salah satu opsi perintah yaitu delete
-        //fungsi peintah ini adalah untuk menghapus data di dalam vector sesuai masukan user
-        //user diminta memasukan data berupa id lalu dicocokan ke dalam data dalam vector
-        //setelah itu data akan terhapus
-        else if(pilihan == "delete" || pilihan == "Delete"){
-            cout << "Masukan id bioskop yang mau dihapus: ";
-            int hapus = 0;
-            cin >> hapus;
-            while(cin.fail()){
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cout << "Masukan hanya angka: ";
-                cin >> hapus;
-            }
-            cin.ignore();
-            bool ketemu = false;
-            iter = daftarbioskop.begin();
-            while(ketemu == false && iter != daftarbioskop.end()){
-                if(iter->getid() == hapus){
-                    ketemu = true;
-                    iter = daftarbioskop.erase(iter);
-                    cout << "data berhasil dihapus...." << endl;
-                }
-                else{
-                    iter++;
-                }
-            }
-            //kondisi jika data id masukan user tidak ditemukan dalam vector
-            if(ketemu == false){
-                cout << "data tidak ditemukan..." << endl;
-            }
-        }
-        //salah satu opsi perintah yaitu search atau untuk melakukan pencarian data spesifik
-        //user diminta memasukan data berupa id, lalu algoritma akan menampilkan
-        //data nama, alamat dll yang sesuai dengan id yang dimasukan user
-        else if(pilihan == "search" || pilihan == "Search"){
-            cout << "Masukan id bioskop yang mau dicari: ";
-            int cari = 0;
-            cin >> cari;
-            while(cin.fail()){
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cout << "Masukan hanya angka: ";
-                cin >> cari;
-            }
-            cin.ignore();
-            bool ketemu = false;
-            iter = daftarbioskop.begin();
-            //perulangan untuk mencari data sesuai masukan user
-            while(ketemu == false && iter != daftarbioskop.end()){
-                if(iter->getid() == cari){
-                    ketemu = true;
-                    cout << "Id: "<< iter->getid() << endl;
-                    cout << "Nama: "<< iter->getnama() << endl;
-                    cout << "Alamat: " << iter->getalamat() << endl;
-                    cout << "jumlah studio: "<< iter->getjumlah_studio() << endl;
-                    cout << "Kota: " << iter->getkota() << endl;
-                }
-                else{
-                    iter++;
-                }
-            }
-            if(ketemu == false){
-                cout << "data tidak ditemukan..." << endl;
             }
         }
         //salah satu opsi perintah, perintah ini untuk menampilkan kembali
@@ -336,9 +300,6 @@ int main(){
             cout << endl;
             cout << "insert: Untuk tambah data baru" << endl;
             cout << "show: Untuk menampilkan data yang ada << endl";
-            cout << "Update: Untuk mengedit data yang ada" << endl;
-            cout << "Delete: Untuk menghapus data" << endl;
-            cout << "Search: untuk mencari data" << endl;
             cout << "Exit: Untuk keluar dari program" << endl;
             cout << "Help: untuk melihat perintah pada program ini" << endl;
         }
